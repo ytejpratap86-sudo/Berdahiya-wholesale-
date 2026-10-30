@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Berdahiya Wholesale Hub – Visual Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0f2340;--navy2:#1b3a63;--org:#d9650f;--orgbg:#fff1e5;--bg:#ffffff;--soft:#f3f6fa;--text:#1c2a3d;--mute:#5a6b82;--line:#dbe3ee;--on-navy:#ffffff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1626;--soft:#101f35;--text:#e8eef6;--mute:#9db0c8;--line:#233854;--orgbg:#3a2412;--org:#ff9a4d}}
+:root[data-theme="dark"]{--bg:#0b1626;--soft:#101f35;--text:#e8eef6;--mute:#9db0c8;--line:#233854;--orgbg:#3a2412;--org:#ff9a4d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 "Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,h3{font-family:Sora,"Segoe UI",system-ui,sans-serif;line-height:1.2;margin:0 0 .5em;color:var(--text)}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--org);outline-offset:2px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+.note{background:var(--orgbg);color:var(--text);font-size:14px;text-align:center;padding:8px 16px;border-bottom:1px solid var(--line)}
+header{background:var(--navy);color:var(--on-navy)}
+.bar{display:flex;align-items:center;gap:16px;padding:12px 0}
+.logo{display:flex;align-items:center;gap:10px;font:700 18px Sora,sans-serif;white-space:nowrap}
+.mark{width:34px;height:34px;border-radius:8px;background:var(--org);display:grid;place-items:center;color:#fff;font:700 18px Sora,sans-serif}
+.search{flex:1;display:flex;min-width:0}
+.search input{flex:1;min-width:0;border:0;border-radius:8px 0 0 8px;padding:11px 14px;font:inherit;background:#fff;color:#1c2a3d}
+.search button{border:0;border-radius:0 8px 8px 0;background:var(--org);color:#fff;font:600 15px inherit;padding:0 18px;cursor:pointer}
+nav.main{display:flex;align-items:center;gap:6px}
+nav.main a{padding:8px 10px;border-radius:8px;font-size:15px}
+nav.main a:hover{background:var(--navy2)}
+.btn{display:inline-block;border:2px solid transparent;border-radius:10px;padding:11px 20px;font:600 15px "Public Sans",sans-serif;cursor:pointer;text-align:center}
+.btn.o{background:var(--org);color:#fff}.btn.o:hover{filter:brightness(1.1)}
+.btn.g{border-color:#fff;color:#fff}.btn.g:hover{background:rgba(255,255,255,.12)}
+.btn.n{background:var(--navy);color:#fff}
+.btn.l{border-color:var(--line);color:var(--text)}
+.burger{display:none;background:none;border:2px solid #fff;border-radius:8px;color:#fff;padding:6px 10px;font-size:18px;cursor:pointer}
+#sbmsg{font-size:13px;padding:0 0 8px;color:#ffd9b8;min-height:0}
+@media(max-width:900px){.burger{display:block;margin-left:auto}.bar{flex-wrap:wrap}.search{order:3;flex-basis:100%}
+nav.main{display:none;flex-basis:100%;order:4;flex-direction:column;align-items:stretch}nav.main.open{display:flex}nav.main a{padding:12px 10px}}
+.hero{background:var(--navy);color:#fff;padding:56px 0 64px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-80px;top:-60px;width:380px;height:380px;border-radius:50%;border:56px solid var(--navy2);opacity:.6}
+.hero .wrap{position:relative;z-index:1}
+.hero h1{font-size:clamp(32px,6vw,56px);color:#fff;max-width:14em}
+.hero p{font-size:clamp(17px,2.4vw,21px);max-width:34em;color:#d5e0ef;margin:0 0 28px}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.trade{display:flex;gap:10px;flex-wrap:wrap;margin-top:32px;color:#b9c9de;font-size:14px}
+.trade span{border:1px solid #3a5a8a;border-radius:99px;padding:4px 12px}
+section{padding:56px 0}
+section.alt{background:var(--soft)}
+.head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.head h2{font-size:clamp(24px,4vw,32px);margin:0}
+.head a{color:var(--org);font-weight:600}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.cat{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;font-weight:600}
+.cat:hover{border-color:var(--org)}
+.cat i{width:40px;height:40px;border-radius:10px;background:var(--orgbg);display:grid;place-items:center;font-style:normal;font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}
+.card{background:var(--bg);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.img{aspect-ratio:4/3;display:grid;place-items:center;position:relative;background:linear-gradient(135deg,var(--c1),var(--c2))}
+.img svg{width:46%;fill:rgba(255,255,255,.88)}
+.tag{position:absolute;left:10px;top:10px;background:rgba(15,35,64,.85);color:#fff;font-size:12px;padding:2px 8px;border-radius:6px}
+.body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px;flex:1}
+.body h3{font-size:16px;margin:0}
+.price{font:700 18px Sora,sans-serif;color:var(--text)}
+.mute{color:var(--mute);font-size:14px}
+.body .btn{margin-top:auto}
+.sup{padding:18px;display:flex;flex-direction:column;gap:8px}
+.av{width:48px;height:48px;border-radius:12px;background:var(--navy);color:#fff;display:grid;place-items:center;font:700 18px Sora,sans-serif}
+.why{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.why div{border-left:4px solid var(--org);padding:4px 0 4px 16px}
+.why h3{font-size:18px}.why p{margin:0;color:var(--mute)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{counter-increment:s;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:20px}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--org);color:#fff;font:700 16px Sora,sans-serif;margin-bottom:12px}
+.steps p{margin:0;color:var(--mute)}
+.sell{background:var(--navy);color:#fff;border-radius:16px;padding:40px 28px;display:flex;gap:24px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.sell h2{color:#fff;font-size:clamp(24px,4vw,32px)}.sell p{margin:0;color:#d5e0ef;max-width:34em}
+footer{background:var(--navy);color:#c9d6e8;padding:48px 0 24px;font-size:15px}
+footer .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:28px}
+footer h3{color:#fff;font-size:16px}
+footer a{display:block;padding:4px 0}footer a:hover{color:#fff}
+footer .fine{border-top:1px solid #2c4670;margin-top:28px;padding-top:16px;font-size:13px}
+.page{padding:48px 0 72px;min-height:55vh}
+.form{max-width:440px;display:flex;flex-direction:column;gap:14px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:24px}
+.form label{font-weight:600;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.form input{border:1px solid var(--line);border-radius:8px;padding:11px 12px;font:inherit;background:var(--bg);color:var(--text)}
+.form input[aria-invalid="true"]{border-color:#c0392b}
+.err{color:#c0392b;font-size:13px;font-weight:500;min-height:0}
+.ok{background:var(--orgbg);border-radius:8px;padding:12px;font-size:14px}
+.empty{text-align:center;border:2px dashed var(--line);border-radius:14px;padding:40px 20px;max-width:560px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="note"><strong>Visual prototype.</strong> All products, prices and suppliers below are placeholders, not real listings.</div>
+<header>
+<div class="wrap">
+<div class="bar">
+<a class="logo" href="#home" aria-label="Berdahiya Wholesale Hub home"><span class="mark">B</span>Berdahiya Wholesale Hub</a>
+<button class="burger" id="burger" aria-expanded="false" aria-controls="nav" aria-label="Open menu">☰</button>
+<form class="search" id="search" role="search"><input type="search" id="q" placeholder="Search wholesale garments" aria-label="Search products"><button type="submit">Search</button></form>
+<nav class="main" id="nav" aria-label="Main">
+<a href="#products">Browse Categories</a><a href="#suppliers">Find Suppliers</a><a href="#login">Login</a><a href="#register">Register</a>
+<a class="btn o" href="#seller">Become a Seller</a>
+</nav>
+</div>
+<div id="sbmsg" role="status"></div>
+</div>
+</header>
+
+<main id="home-view">
+<div class="hero"><div class="wrap">
+<h1>India’s Wholesale Garment Marketplace</h1>
+<p>Discover Wholesale Fashion. Connect with Suppliers. Grow Your Business.</p>
+<div class="cta"><a class="btn o" href="#products">Explore Products</a><a class="btn g" href="#seller">Become a Seller</a></div>
+<div class="trade"><span>Prices in ₹ INR</span><span>Minimum order quantities</span><span>Manufacturers, wholesalers and distributors</span></div>
+</div></div>
+
+<section><div class="wrap">
+<div class="head"><h2>Shop by category</h2><a href="#products">All categories</a></div>
+<div class="cats" id="cats"></div>
+</div></section>
+
+<section class="alt"><div class="wrap">
+<div class="head"><h2>Featured wholesale products</h2><a href="#products">Browse products</a></div>
+<div class="grid" id="prods"></div>
+</div></section>
+
+<section><div class="wrap">
+<div class="head"><h2>Featured suppliers</h2><a href="#suppliers">Find suppliers</a></div>
+<div class="grid" id="sups"></div>
+</div></section>
+
+<section class="alt"><div class="wrap">
+<div class="head"><h2>Why choose Berdahiya Wholesale Hub?</h2></div>
+<div class="why">
+<div><h3>Built for bulk orders</h3><p>Listings show price per piece, set size and minimum order quantity up front.</p></div>
+<div><h3>Direct supplier contact</h3><p>Talk to manufacturers and wholesalers without a middleman.</p></div>
+<div><h3>Made for India</h3><p>Prices in ₹, categories that match how Indian garment trade works.</p></div>
+<div><h3>Verified profiles (planned)</h3><p>Supplier verification is part of a later build step.</p></div>
+</div></div></section>
+
+<section><div class="wrap">
+<div class="head"><h2>How it works</h2></div>
+<ol class="steps">
+<li><h3>Register</h3><p>Create a free buyer or seller account.</p></li>
+<li><h3>Discover products</h3><p>Search by category, fabric, price or supplier.</p></li>
+<li><h3>Order in bulk</h3><p>Send an enquiry or place a bulk order.</p></li>
+<li><h3>Grow your business</h3><p>Reorder from suppliers you trust.</p></li>
+</ol>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+<div class="sell"><div><h2>Sell your garments to shopkeepers across India</h2><p>List your catalogue, set minimum orders and reach bulk buyers. Seller onboarding opens in a later step.</p></div><a class="btn o" href="#seller">Become a Seller</a></div>
+</div></section>
+</main>
+
+<main class="page" id="other-view" hidden><div class="wrap" id="other"></div></main>
+
+<footer><div class="wrap">
+<div class="cols">
+<div><h3>Berdahiya Wholesale Hub</h3><p>B2B wholesale garment marketplace for India.</p></div>
+<div><h3>Explore</h3><a href="#products">Browse Products</a><a href="#suppliers">Browse Suppliers</a><a href="#seller">Become a Seller</a></div>
+<div><h3>Company</h3><a href="#about">About Us</a><a href="#contact">Contact Us</a></div>
+<div><h3>Legal</h3><a href="#privacy">Privacy Policy</a><a href="#terms">Terms and Conditions</a></div>
+<div><h3>Contact</h3><p>Email and phone: placeholder, to be added.</p></div>
+</div>
+<div class="fine">© 2026 Berdahiya Wholesale Hub. Prototype with placeholder content.</div>
+</div></footer>
+
+<script>
+var CATS=[["Men’s Wear","👔"],["Women’s Wear","👗"],["Kids’ Wear","🧸"],["Ethnic Wear","🥻"],["T-Shirts","👕"],["Shirts","👔"],["Jeans","👖"],["Sportswear","🏃"],["Winter Wear","🧥"],["Garment Accessories","🧵"]];
+var PR=[["Cotton round-neck T-shirt","₹145 / pc","Set of 12 · MOQ 5 sets","#1b3a63","#2f6aa8"],["Slim-fit denim jeans","₹420 / pc","Set of 10 · MOQ 3 sets","#26344d","#4a6a99"],["Printed cotton kurti","₹260 / pc","Set of 8 · MOQ 4 sets","#a8480b","#e08a3c"],["Fleece zip hoodie","₹390 / pc","Set of 6 · MOQ 5 sets","#2a4a43","#4f8f7f"]];
+var SU=[["Sample Supplier A","Manufacturer","City placeholder"],["Sample Supplier B","Wholesaler","City placeholder"],["Sample Supplier C","Distributor","City placeholder"]];
+var TEE='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 8 8 16l5 12 7-3v31h24V25l7 3 5-12-14-8c-1 5-5 8-10 8s-9-3-10-8z"/></svg>';
+document.getElementById("cats").innerHTML=CATS.map(function(c){return '<a class="cat" href="#products"><i>'+c[1]+'</i>'+c[0]+'</a>'}).join("");
+document.getElementById("prods").innerHTML=PR.map(function(p){return '<article class="card"><div class="img" style="--c1:'+p[3]+';--c2:'+p[4]+'">'+TEE+'<span class="tag">Sample</span></div><div class="body"><h3>'+p[0]+'</h3><div class="price">'+p[1]+'</div><div class="mute">'+p[2]+'</div><a class="btn l" href="#products">View details</a></div></article>'}).join("");
+document.getElementById("sups").innerHTML=SU.map(function(s){return '<article class="card sup"><div class="av">'+s[0].slice(-1)+'</div><h3>'+s[0]+'</h3><div class="mute">'+s[1]+' · '+s[2]+'</div><span class="tag" style="position:static;align-self:flex-start">Placeholder</span><a class="btn l" href="#suppliers">View supplier</a></article>'}).join("");
+
+var burger=document.getElementById("burger"),nav=document.getElementById("nav");
+burger.onclick=function(){var o=nav.classList.toggle("open");burger.setAttribute("aria-expanded",o)};
+document.getElementById("search").onsubmit=function(e){e.preventDefault();document.getElementById("sbmsg").textContent="Product search will be added in a later step."};
+
+function soon(title,text){return '<h1>'+title+'</h1><div class="empty"><h3>Coming in a later step</h3><p class="mute">'+text+'</p><a class="btn n" href="#home">Back to home</a></div>'}
+function formHtml(kind){var reg=kind==="register";return '<h1>'+(reg?"Create your account":"Log in")+'</h1><form class="form" id="f" novalidate>'+(reg?'<label>Business name<input name="biz" autocomplete="organization"><span class="err"></span></label>':'')+'<label>Email<input name="email" type="email" autocomplete="email"><span class="err"></span></label><label>Password<input name="pw" type="password" autocomplete="'+(reg?"new-password":"current-password")+'"><span class="err"></span></label><button class="btn o" type="submit">'+(reg?"Create account":"Log in")+'</button><div class="ok" id="ok" hidden>Form checks passed. Accounts are not connected yet; sign-in arrives in a later step.</div></form>'}
+function bindForm(reg){var f=document.getElementById("f");f.onsubmit=function(e){e.preventDefault();var good=true;Array.prototype.forEach.call(f.querySelectorAll("input"),function(i){var m="",v=i.value.trim();if(i.name==="biz"&&v.length<2)m="Enter your business name.";if(i.name==="email"&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v))m="Enter a valid email address.";if(i.name==="pw"&&i.value.length<(reg?8:1))m=reg?"Use at least 8 characters.":"Enter your password.";i.nextElementSibling.textContent=m;i.setAttribute("aria-invalid",m?"true":"false");if(m)good=false});document.getElementById("ok").hidden=!good}}
+var VIEWS={products:function(){return soon("Browse Products","Product listing with filters, product cards and product detail pages.")},suppliers:function(){return soon("Browse Suppliers","Supplier directory and supplier profile pages.")},seller:function(){return soon("Become a Seller","Seller registration and catalogue upload.")},about:function(){return soon("About Us","Company story and mission.")},contact:function(){return soon("Contact Us","Contact form and business details.")},privacy:function(){return soon("Privacy Policy","Legal text to be written and reviewed before launch.")},terms:function(){return soon("Terms and Conditions","Legal text to be written and reviewed before launch.")},login:function(){return formHtml("login")},register:function(){return formHtml("register")}};
+function route(){var h=(location.hash||"#home").slice(1),home=document.getElementById("home-view"),o=document.getElementById("other-view");nav.classList.remove("open");burger.setAttribute("aria-expanded","false");
+if(VIEWS[h]){home.hidden=true;o.hidden=false;document.getElementById("other").innerHTML=VIEWS[h]();if(h==="login"||h==="register")bindForm(h==="register");window.scrollTo(0,0)}else{home.hidden=false;o.hidden=true}}
+window.addEventListener("hashchange",route);route();
+</script>
+</body>
+</html>
