@@ -8,6 +8,13 @@ or tested. There is no production frontend in this repo yet; `prototype/`
 is a visual mock-up only. Read `docs/PRODUCTION_READINESS.md` first.
 Not production ready.
 
+## Website (static)
+`site/index.html` is a single-file site with real Supabase sign-in
+(register, login, logout, password reset, account page). Upload it to
+Cloudflare Pages. It still shows placeholder products. In Supabase set
+Authentication > URL Configuration: Site URL and Redirect URLs to your
+site address.
+
 ## Database
 Migrations are in `supabase/migrations`, named in run order.
 Run them one at a time (Supabase Dashboard > SQL Editor, new query tab

@@ -89,10 +89,12 @@ footer .fine{border-top:1px solid #2c4670;margin-top:28px;padding-top:16px;font-
 .ok{background:var(--orgbg);border-radius:8px;padding:12px;font-size:14px}
 .empty{text-align:center;border:2px dashed var(--line);border-radius:14px;padding:40px 20px;max-width:560px}
 [hidden]{display:none!important}
+#authlinks{display:contents}.banner{border-radius:8px;padding:12px;font-size:14px}.banner.bad{background:rgba(192,57,43,.15);border:1px solid #c0392b}.banner.ok{background:var(--orgbg)}.btn:disabled{opacity:.6;cursor:wait}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-<div class="note"><strong>Visual prototype.</strong> All products, prices and suppliers below are placeholders, not real listings.</div>
+<div class="note"><strong>Early version.</strong> Sign-in is real. Products, prices and suppliers below are placeholders, not real listings.</div>
 <header>
 <div class="wrap">
 <div class="bar">
@@ -100,7 +102,7 @@ footer .fine{border-top:1px solid #2c4670;margin-top:28px;padding-top:16px;font-
 <button class="burger" id="burger" aria-expanded="false" aria-controls="nav" aria-label="Open menu">☰</button>
 <form class="search" id="search" role="search"><input type="search" id="q" placeholder="Search wholesale garments" aria-label="Search products"><button type="submit">Search</button></form>
 <nav class="main" id="nav" aria-label="Main">
-<a href="#products">Browse Categories</a><a href="#suppliers">Find Suppliers</a><a href="#login">Login</a><a href="#register">Register</a>
+<a href="#products">Browse Categories</a><a href="#suppliers">Find Suppliers</a><span id="authlinks"></span>
 <a class="btn o" href="#seller">Become a Seller</a>
 </nav>
 </div>
@@ -186,8 +188,105 @@ function formHtml(kind){var reg=kind==="register";return '<h1>'+(reg?"Create you
 function bindForm(reg){var f=document.getElementById("f");f.onsubmit=function(e){e.preventDefault();var good=true;Array.prototype.forEach.call(f.querySelectorAll("input"),function(i){var m="",v=i.value.trim();if(i.name==="biz"&&v.length<2)m="Enter your business name.";if(i.name==="email"&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v))m="Enter a valid email address.";if(i.name==="pw"&&i.value.length<(reg?8:1))m=reg?"Use at least 8 characters.":"Enter your password.";i.nextElementSibling.textContent=m;i.setAttribute("aria-invalid",m?"true":"false");if(m)good=false});document.getElementById("ok").hidden=!good}}
 var VIEWS={products:function(){return soon("Browse Products","Product listing with filters, product cards and product detail pages.")},suppliers:function(){return soon("Browse Suppliers","Supplier directory and supplier profile pages.")},seller:function(){return soon("Become a Seller","Seller registration and catalogue upload.")},about:function(){return soon("About Us","Company story and mission.")},contact:function(){return soon("Contact Us","Contact form and business details.")},privacy:function(){return soon("Privacy Policy","Legal text to be written and reviewed before launch.")},terms:function(){return soon("Terms and Conditions","Legal text to be written and reviewed before launch.")},login:function(){return formHtml("login")},register:function(){return formHtml("register")}};
 function route(){var h=(location.hash||"#home").slice(1),home=document.getElementById("home-view"),o=document.getElementById("other-view");nav.classList.remove("open");burger.setAttribute("aria-expanded","false");
-if(VIEWS[h]){home.hidden=true;o.hidden=false;document.getElementById("other").innerHTML=VIEWS[h]();if(h==="login"||h==="register")bindForm(h==="register");window.scrollTo(0,0)}else{home.hidden=false;o.hidden=true}}
+if(VIEWS[h]){home.hidden=true;o.hidden=false;document.getElementById("other").innerHTML=VIEWS[h]();if(window.AFTER&&AFTER[h])AFTER[h]();window.scrollTo(0,0)}else{home.hidden=false;o.hidden=true}}
 window.addEventListener("hashchange",route);route();
+</script>
+<script>
+(function(){
+var SB_URL="https://nvwrgkvgckignpliebmb.supabase.co";
+var SB_KEY="sb_publishable_GAnvv-vB5vZGtB4eFWDxUA_J5v4r06L";
+var AUTHERR="";
+var m=/error_description=([^&]+)/.exec(location.hash);
+if(m){AUTHERR=decodeURIComponent(m[1].replace(/\+/g," "));history.replaceState(null,"",location.pathname+"#login")}
+var sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+var SESSION=null,READY=false;
+window.AFTER=window.AFTER||{};
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function friendly(e){var t=(e&&e.message)||"Something went wrong.";
+if(/invalid login credentials/i.test(t))return "Incorrect email or password.";
+if(/email not confirmed/i.test(t))return "Please verify your email first. Check your inbox.";
+if(/already registered/i.test(t))return "This email is already registered. Try logging in.";
+if(/rate limit|too many|security purposes/i.test(t))return "Too many attempts. Please wait a few minutes and try again.";
+if(/password/i.test(t))return "Password is too weak. Use at least 8 characters.";
+if(/network|failed to fetch/i.test(t))return "Network problem. Check your connection and try again.";
+return t}
+function field(label,name,type,ac){return '<label>'+label+'<input name="'+name+'" type="'+type+'" autocomplete="'+ac+'"><span class="err"></span></label>'}
+function setErr(f,name,msg){var i=f.elements[name];i.nextElementSibling.textContent=msg;i.setAttribute("aria-invalid",msg?"true":"false");return !msg}
+function banner(f,msg,ok){var b=f.querySelector(".banner");b.className="banner "+(ok?"ok":"bad");b.textContent=msg;b.hidden=!msg}
+function busy(f,on,label){var b=f.querySelector("button[type=submit]");b.disabled=on;if(label)b.textContent=on?"Please wait…":label}
+var EMAIL=/^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+function renderAuth(){var el=$("authlinks");
+el.innerHTML=SESSION?'<a href="#account">My account</a><a href="#" id="logout">Log out</a>':'<a href="#login">Login</a><a href="#register">Register</a>';
+var lo=$("logout");if(lo)lo.onclick=function(e){e.preventDefault();sb.auth.signOut()}}
+
+VIEWS.login=function(){return '<h1>Log in</h1><form class="form" id="f" novalidate>'+field("Email","email","email","email")+field("Password","pw","password","current-password")+'<button class="btn o" type="submit">Log in</button><div class="banner" hidden role="alert"></div><p class="mute"><a href="#forgot" style="text-decoration:underline">Forgot password?</a> · <a href="#register" style="text-decoration:underline">Create account</a></p></form>'};
+AFTER.login=function(){var f=$("f");if(AUTHERR){banner(f,AUTHERR,false);AUTHERR=""}
+f.onsubmit=function(e){e.preventDefault();var em=f.elements.email.value.trim(),pw=f.elements.pw.value;
+var ok=setErr(f,"email",EMAIL.test(em)?"":"Enter a valid email address.");ok=setErr(f,"pw",pw?"":"Enter your password.")&&ok;if(!ok)return;
+busy(f,true,"Log in");banner(f,"");
+sb.auth.signInWithPassword({email:em,password:pw}).then(function(r){busy(f,false,"Log in");
+if(r.error){banner(f,friendly(r.error),false);return}SESSION=r.data.session;renderAuth();location.hash="#account"})
+.catch(function(x){busy(f,false,"Log in");banner(f,friendly(x),false)})}};
+
+VIEWS.register=function(){return '<h1>Create your account</h1><form class="form" id="f" novalidate>'+field("Full name","name","text","name")+field("Email","email","email","email")+field("Password (8+ characters)","pw","password","new-password")+field("Confirm password","pw2","password","new-password")+'<button class="btn o" type="submit">Create account</button><div class="banner" hidden role="alert"></div><p class="mute">Everyone starts as a buyer. Selling needs a separate application (coming later).</p></form>'};
+AFTER.register=function(){var f=$("f");
+f.onsubmit=function(e){e.preventDefault();var nm=f.elements.name.value.trim(),em=f.elements.email.value.trim(),pw=f.elements.pw.value,p2=f.elements.pw2.value;
+var ok=setErr(f,"name",nm.length>=2?"":"Enter your name.");
+ok=setErr(f,"email",EMAIL.test(em)?"":"Enter a valid email address.")&&ok;
+ok=setErr(f,"pw",pw.length>=8?"":"Use at least 8 characters.")&&ok;
+ok=setErr(f,"pw2",p2===pw?"":"Passwords do not match.")&&ok;if(!ok)return;
+busy(f,true,"Create account");banner(f,"");
+sb.auth.signUp({email:em,password:pw,options:{data:{full_name:nm},emailRedirectTo:location.origin+location.pathname}}).then(function(r){busy(f,false,"Create account");
+if(r.error){banner(f,friendly(r.error),false);return}
+if(r.data.user&&r.data.user.identities&&r.data.user.identities.length===0){banner(f,"This email is already registered. Try logging in.",false);return}
+if(r.data.session){SESSION=r.data.session;renderAuth();location.hash="#account";return}
+f.reset();banner(f,"Account created. Check your email for a verification link, then log in.",true)})
+.catch(function(x){busy(f,false,"Create account");banner(f,friendly(x),false)})}};
+
+VIEWS.forgot=function(){return '<h1>Reset password</h1><form class="form" id="f" novalidate>'+field("Email","email","email","email")+'<button class="btn o" type="submit">Send reset link</button><div class="banner" hidden role="alert"></div></form>'};
+AFTER.forgot=function(){var f=$("f");
+f.onsubmit=function(e){e.preventDefault();var em=f.elements.email.value.trim();
+if(!setErr(f,"email",EMAIL.test(em)?"":"Enter a valid email address."))return;
+busy(f,true,"Send reset link");
+sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname}).then(function(r){busy(f,false,"Send reset link");
+if(r.error){banner(f,friendly(r.error),false);return}
+banner(f,"If this email has an account, a reset link is on its way.",true)})
+.catch(function(x){busy(f,false,"Send reset link");banner(f,friendly(x),false)})}};
+
+VIEWS.reset=function(){if(!READY)return '<p class="mute">Loading…</p>';
+if(!SESSION)return '<h1>Set a new password</h1><div class="empty"><p class="mute">Open the reset link from your email first.</p><a class="btn n" href="#forgot">Request a link</a></div>';
+return '<h1>Set a new password</h1><form class="form" id="f" novalidate>'+field("New password (8+ characters)","pw","password","new-password")+field("Confirm password","pw2","password","new-password")+'<button class="btn o" type="submit">Save password</button><div class="banner" hidden role="alert"></div></form>'};
+AFTER.reset=function(){var f=$("f");if(!f)return;
+f.onsubmit=function(e){e.preventDefault();var pw=f.elements.pw.value,p2=f.elements.pw2.value;
+var ok=setErr(f,"pw",pw.length>=8?"":"Use at least 8 characters.");ok=setErr(f,"pw2",p2===pw?"":"Passwords do not match.")&&ok;if(!ok)return;
+busy(f,true,"Save password");
+sb.auth.updateUser({password:pw}).then(function(r){busy(f,false,"Save password");
+if(r.error){banner(f,friendly(r.error),false);return}
+banner(f,"Password updated.",true);setTimeout(function(){location.hash="#account"},900)})
+.catch(function(x){busy(f,false,"Save password");banner(f,friendly(x),false)})}};
+
+VIEWS.account=function(){if(!READY)return '<p class="mute">Loading…</p>';
+if(!SESSION){setTimeout(function(){location.hash="#login"},0);return '<p class="mute">Please log in to see your account.</p>'}
+return '<h1>My account</h1><div class="form" style="max-width:560px"><p><strong>Email:</strong> '+esc(SESSION.user.email)+'</p><p id="acct-profile" class="mute">Loading profile…</p><p id="acct-seller" class="mute"></p></div>'};
+AFTER.account=function(){var u=SESSION&&SESSION.user;if(!u)return;
+sb.from("profiles").select("full_name,role").eq("id",u.id).maybeSingle().then(function(r){var el=$("acct-profile");if(!el)return;
+if(r.error){el.textContent="Could not load your profile.";return}
+if(!r.data){el.textContent="Profile not found. The database setup may be incomplete.";return}
+el.innerHTML="<strong>Name:</strong> "+esc(r.data.full_name||"—")+"<br><strong>Account type:</strong> "+esc(r.data.role)});
+sb.from("seller_profiles").select("business_name,approval_status,review_note").eq("user_id",u.id).maybeSingle().then(function(r){var el=$("acct-seller");if(!el||r.error)return;
+if(!r.data){el.textContent="No seller application.";return}
+var L={pending:"Pending review",approved:"Approved",rejected:"Rejected",suspended:"Suspended"};
+el.innerHTML="<strong>Seller application:</strong> "+esc(L[r.data.approval_status]||r.data.approval_status)+(r.data.review_note?"<br>Note: "+esc(r.data.review_note):"")})};
+
+sb.auth.onAuthStateChange(function(ev,s){SESSION=s;renderAuth();
+if(ev==="PASSWORD_RECOVERY"){location.hash="#reset";return}
+if(ev==="SIGNED_IN"&&(location.hash==="#login"||location.hash==="#register"))location.hash="#account";
+if(ev==="SIGNED_OUT"){if(location.hash==="#home"||!location.hash)route();else location.hash="#home"}});
+sb.auth.getSession().then(function(r){SESSION=r.data.session;READY=true;renderAuth();route()})
+.catch(function(){READY=true;renderAuth();route()});
+renderAuth();
+})();
 </script>
 </body>
 </html>
