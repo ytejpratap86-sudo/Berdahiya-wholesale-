@@ -89,12 +89,12 @@ footer .fine{border-top:1px solid #2c4670;margin-top:28px;padding-top:16px;font-
 .ok{background:var(--orgbg);border-radius:8px;padding:12px;font-size:14px}
 .empty{text-align:center;border:2px dashed var(--line);border-radius:14px;padding:40px 20px;max-width:560px}
 [hidden]{display:none!important}
-#authlinks{display:contents}.banner{border-radius:8px;padding:12px;font-size:14px}.banner.bad{background:rgba(192,57,43,.15);border:1px solid #c0392b}.banner.ok{background:var(--orgbg)}.btn:disabled{opacity:.6;cursor:wait}
+#authlinks{display:contents}.banner{border-radius:8px;padding:12px;font-size:14px}.banner.bad{background:rgba(192,57,43,.15);border:1px solid #c0392b}.banner.ok{background:var(--orgbg)}.btn:disabled{opacity:.6;cursor:not-allowed}.form select{border:1px solid var(--line);border-radius:8px;padding:11px 12px;font:inherit;background:var(--bg);color:var(--text)}.img img{width:100%;height:100%;object-fit:cover}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-<div class="note"><strong>Early version.</strong> Sign-in is real. Products, prices and suppliers below are placeholders, not real listings.</div>
+<div class="note"><strong>Early version.</strong> Products, suppliers and sign-in come from the live database. Checkout is not ready yet.</div>
 <header>
 <div class="wrap">
 <div class="bar">
@@ -175,19 +175,16 @@ var CATS=[["Men’s Wear","👔"],["Women’s Wear","👗"],["Kids’ Wear","�
 var PR=[["Cotton round-neck T-shirt","₹145 / pc","Set of 12 · MOQ 5 sets","#1b3a63","#2f6aa8"],["Slim-fit denim jeans","₹420 / pc","Set of 10 · MOQ 3 sets","#26344d","#4a6a99"],["Printed cotton kurti","₹260 / pc","Set of 8 · MOQ 4 sets","#a8480b","#e08a3c"],["Fleece zip hoodie","₹390 / pc","Set of 6 · MOQ 5 sets","#2a4a43","#4f8f7f"]];
 var SU=[["Sample Supplier A","Manufacturer","City placeholder"],["Sample Supplier B","Wholesaler","City placeholder"],["Sample Supplier C","Distributor","City placeholder"]];
 var TEE='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 8 8 16l5 12 7-3v31h24V25l7 3 5-12-14-8c-1 5-5 8-10 8s-9-3-10-8z"/></svg>';
-document.getElementById("cats").innerHTML=CATS.map(function(c){return '<a class="cat" href="#products"><i>'+c[1]+'</i>'+c[0]+'</a>'}).join("");
-document.getElementById("prods").innerHTML=PR.map(function(p){return '<article class="card"><div class="img" style="--c1:'+p[3]+';--c2:'+p[4]+'">'+TEE+'<span class="tag">Sample</span></div><div class="body"><h3>'+p[0]+'</h3><div class="price">'+p[1]+'</div><div class="mute">'+p[2]+'</div><a class="btn l" href="#products">View details</a></div></article>'}).join("");
-document.getElementById("sups").innerHTML=SU.map(function(s){return '<article class="card sup"><div class="av">'+s[0].slice(-1)+'</div><h3>'+s[0]+'</h3><div class="mute">'+s[1]+' · '+s[2]+'</div><span class="tag" style="position:static;align-self:flex-start">Placeholder</span><a class="btn l" href="#suppliers">View supplier</a></article>'}).join("");
 
 var burger=document.getElementById("burger"),nav=document.getElementById("nav");
 burger.onclick=function(){var o=nav.classList.toggle("open");burger.setAttribute("aria-expanded",o)};
-document.getElementById("search").onsubmit=function(e){e.preventDefault();document.getElementById("sbmsg").textContent="Product search will be added in a later step."};
+document.getElementById("search").onsubmit=function(e){e.preventDefault();var q=document.getElementById("q").value.trim();location.hash="#products"+(q?"?q="+encodeURIComponent(q):"")};
 
 function soon(title,text){return '<h1>'+title+'</h1><div class="empty"><h3>Coming in a later step</h3><p class="mute">'+text+'</p><a class="btn n" href="#home">Back to home</a></div>'}
 function formHtml(kind){var reg=kind==="register";return '<h1>'+(reg?"Create your account":"Log in")+'</h1><form class="form" id="f" novalidate>'+(reg?'<label>Business name<input name="biz" autocomplete="organization"><span class="err"></span></label>':'')+'<label>Email<input name="email" type="email" autocomplete="email"><span class="err"></span></label><label>Password<input name="pw" type="password" autocomplete="'+(reg?"new-password":"current-password")+'"><span class="err"></span></label><button class="btn o" type="submit">'+(reg?"Create account":"Log in")+'</button><div class="ok" id="ok" hidden>Form checks passed. Accounts are not connected yet; sign-in arrives in a later step.</div></form>'}
 function bindForm(reg){var f=document.getElementById("f");f.onsubmit=function(e){e.preventDefault();var good=true;Array.prototype.forEach.call(f.querySelectorAll("input"),function(i){var m="",v=i.value.trim();if(i.name==="biz"&&v.length<2)m="Enter your business name.";if(i.name==="email"&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v))m="Enter a valid email address.";if(i.name==="pw"&&i.value.length<(reg?8:1))m=reg?"Use at least 8 characters.":"Enter your password.";i.nextElementSibling.textContent=m;i.setAttribute("aria-invalid",m?"true":"false");if(m)good=false});document.getElementById("ok").hidden=!good}}
 var VIEWS={products:function(){return soon("Browse Products","Product listing with filters, product cards and product detail pages.")},suppliers:function(){return soon("Browse Suppliers","Supplier directory and supplier profile pages.")},seller:function(){return soon("Become a Seller","Seller registration and catalogue upload.")},about:function(){return soon("About Us","Company story and mission.")},contact:function(){return soon("Contact Us","Contact form and business details.")},privacy:function(){return soon("Privacy Policy","Legal text to be written and reviewed before launch.")},terms:function(){return soon("Terms and Conditions","Legal text to be written and reviewed before launch.")},login:function(){return formHtml("login")},register:function(){return formHtml("register")}};
-function route(){var h=(location.hash||"#home").slice(1),home=document.getElementById("home-view"),o=document.getElementById("other-view");nav.classList.remove("open");burger.setAttribute("aria-expanded","false");
+function route(){var h=(location.hash||"#home").slice(1).split(/[\/?]/)[0],home=document.getElementById("home-view"),o=document.getElementById("other-view");nav.classList.remove("open");burger.setAttribute("aria-expanded","false");
 if(VIEWS[h]){home.hidden=true;o.hidden=false;document.getElementById("other").innerHTML=VIEWS[h]();if(window.AFTER&&AFTER[h])AFTER[h]();window.scrollTo(0,0)}else{home.hidden=false;o.hidden=true}}
 window.addEventListener("hashchange",route);route();
 </script>
@@ -200,7 +197,7 @@ var m=/error_description=([^&]+)/.exec(location.hash);
 if(m){AUTHERR=decodeURIComponent(m[1].replace(/\+/g," "));history.replaceState(null,"",location.pathname+"#login")}
 var sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 var SESSION=null,READY=false;
-window.AFTER=window.AFTER||{};
+window.AFTER=window.AFTER||{};window.SB=sb;window.esc=esc;window.friendly=friendly;window.AUTHSESSION=function(){return SESSION};window.AUTHREADY=function(){return READY};
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function friendly(e){var t=(e&&e.message)||"Something went wrong.";
@@ -217,7 +214,7 @@ function banner(f,msg,ok){var b=f.querySelector(".banner");b.className="banner "
 function busy(f,on,label){var b=f.querySelector("button[type=submit]");b.disabled=on;if(label)b.textContent=on?"Please wait…":label}
 var EMAIL=/^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 function renderAuth(){var el=$("authlinks");
-el.innerHTML=SESSION?'<a href="#account">My account</a><a href="#" id="logout">Log out</a>':'<a href="#login">Login</a><a href="#register">Register</a>';
+el.innerHTML=SESSION?'<a href="#cart">Cart</a><a href="#account">My account</a><a href="#" id="logout">Log out</a>':'<a href="#login">Login</a><a href="#register">Register</a>';
 var lo=$("logout");if(lo)lo.onclick=function(e){e.preventDefault();sb.auth.signOut()}}
 
 VIEWS.login=function(){return '<h1>Log in</h1><form class="form" id="f" novalidate>'+field("Email","email","email","email")+field("Password","pw","password","current-password")+'<button class="btn o" type="submit">Log in</button><div class="banner" hidden role="alert"></div><p class="mute"><a href="#forgot" style="text-decoration:underline">Forgot password?</a> · <a href="#register" style="text-decoration:underline">Create account</a></p></form>'};
@@ -286,6 +283,89 @@ if(ev==="SIGNED_OUT"){if(location.hash==="#home"||!location.hash)route();else lo
 sb.auth.getSession().then(function(r){SESSION=r.data.session;READY=true;renderAuth();route()})
 .catch(function(){READY=true;renderAuth();route()});
 renderAuth();
+})();
+</script>
+<script>
+(function(){
+var sb=window.SB,esc=window.esc;
+function $(i){return document.getElementById(i)}
+var inr=new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2});
+function rpc(n,a){return sb.rpc(n,a||{}).then(function(r){if(r.error)throw r.error;return r.data})}
+function emsg(e){var m=(e&&e.message)||"";if(e&&(e.code==="PGRST202"||/find the function/i.test(m)))return "Backend setup is incomplete: a database function is missing. Run the SQL migrations in order.";return window.friendly?window.friendly(e):(m||"Something went wrong.")}
+function box(el,t,m){el.innerHTML='<div class="'+(t==="error"?"banner bad":"empty")+'" role="'+(t==="error"?"alert":"status")+'"><p class="mute">'+esc(m)+'</p></div>'}
+function imgHtml(p,alt){if(!p)return '<span style="color:#fff">No image</span>';return '<img src="'+esc(sb.storage.from("product-images").getPublicUrl(p).data.publicUrl)+'" alt="'+esc(alt)+'" loading="lazy" width="400" height="300">'}
+var AV={in_stock:"In stock",low_stock:"Low stock",out_of_stock:"Out of stock"};
+function loc(c,s){return [c,s].filter(Boolean).join(", ")}
+function stars(a,c){return c>0?"★ "+Number(a).toFixed(1)+" ("+c+")":"No reviews yet"}
+function card(p){var u="#product/"+p.product_id;return '<article class="card"><a class="img" style="--c1:#1b3a63;--c2:#2f6aa8" href="'+u+'">'+imgHtml(p.image_path,p.name)+'</a><div class="body"><h3>'+esc(p.name)+'</h3><div class="price">From '+inr.format(p.start_price)+' / pc</div><div class="mute">MOQ '+p.moq+' pcs · '+AV[p.availability]+'</div><div class="mute">'+esc(p.supplier_name)+(p.supplier_verified?" ✔ Verified":"")+' · '+esc(loc(p.supplier_city,p.supplier_state))+'</div><div class="mute">'+stars(p.avg_rating,p.review_count)+'</div><a class="btn l" href="'+u+'">View details</a></div></article>'}
+function supCard(s){return '<article class="card sup"><div class="av">'+esc((s.business_name||"?").charAt(0).toUpperCase())+'</div><h3>'+esc(s.business_name)+'</h3><div class="mute">'+esc(loc(s.city,s.state))+'</div><div class="mute">'+s.product_count+' products · '+stars(s.avg_rating,s.review_count)+'</div>'+(s.verified?'<span class="tag" style="position:static;align-self:flex-start">✔ Verified</span>':'')+'<a class="btn l" href="#products?seller='+s.seller_id+'">View products</a></article>'}
+function qs(){var h=location.hash,i=h.indexOf("?"),o={};if(i>=0)h.slice(i+1).split("&").forEach(function(x){var k=x.split("=");if(k[0])o[k[0]]=decodeURIComponent((k[1]||"").replace(/\+/g," "))});return o}
+function pager(el,page,total,per,go){var pages=Math.max(1,Math.ceil(total/per));el.innerHTML="";if(pages<2)return;
+var a=document.createElement("button"),b=document.createElement("button"),t=document.createElement("span");
+a.className=b.className="btn l";a.textContent="Previous";b.textContent="Next";a.disabled=page<=1;b.disabled=page>=pages;t.className="mute";t.textContent="Page "+page+" of "+pages;
+a.onclick=function(){go(page-1)};b.onclick=function(){go(page+1)};el.appendChild(a);el.appendChild(t);el.appendChild(b)}
+
+// ----- home page -----
+function loadHome(){var c=$("cats"),p=$("prods"),s=$("sups");if(!c)return;
+c.textContent=p.textContent=s.textContent="Loading…";
+rpc("list_marketplace_categories").then(function(r){c.innerHTML=r.length?r.map(function(x){return '<a class="cat" href="#products?cat='+encodeURIComponent(x.category)+'"><i>🧵</i>'+esc(x.category)+'</a>'}).join(""):"";if(!r.length)box(c,"empty","Categories will appear when products are listed.")}).catch(function(e){box(c,"error",emsg(e))});
+rpc("search_marketplace_products",{p_limit:4}).then(function(r){if(!r.length){box(p,"empty","No products are listed yet.");return}p.innerHTML=r.map(card).join("")}).catch(function(e){box(p,"error",emsg(e))});
+rpc("list_marketplace_suppliers",{p_limit:3}).then(function(r){if(!r.length){box(s,"empty","No suppliers are listed yet.");return}s.innerHTML=r.map(supCard).join("")}).catch(function(e){box(s,"error",emsg(e))})}
+
+// ----- products list -----
+VIEWS.products=function(){return '<h1>Products</h1><form class="form" id="pf" style="max-width:none;flex-direction:row;flex-wrap:wrap;align-items:end" novalidate><label>Search<input name="q" type="search"></label><label>Category<select name="cat"><option value="">All</option></select></label><label>Sort<select name="sort"><option value="newest">Newest</option><option value="price_asc">Price: low to high</option><option value="price_desc">Price: high to low</option><option value="best_selling">Best selling</option><option value="top_rated">Highest rated</option></select></label><label>Min price (₹)<input name="min" type="number" min="0"></label><label>Max price (₹)<input name="max" type="number" min="0"></label><button class="btn o" type="submit">Apply</button></form><p id="pinfo" class="mute" role="status"></p><div class="grid" id="plist"></div><div id="pager" style="display:flex;gap:12px;align-items:center;margin-top:20px"></div>'};
+AFTER.products=function(){var S=qs(),f=$("pf"),list=$("plist"),info=$("pinfo"),PER=12;S.page=parseInt(S.page||"1",10)||1;
+f.q.value=S.q||"";f.sort.value=S.sort||"newest";f.min.value=S.min||"";f.max.value=S.max||"";
+rpc("list_marketplace_categories").then(function(r){r.forEach(function(x){var o=document.createElement("option");o.value=o.textContent=x.category;f.cat.appendChild(o)});f.cat.value=S.cat||""}).catch(function(){});
+function load(){history.replaceState(null,"","#products?"+Object.keys(S).filter(function(k){return S[k]&&!(k==="page"&&S[k]===1)}).map(function(k){return k+"="+encodeURIComponent(S[k])}).join("&"));
+box(list,"load","Loading products…");info.textContent="";
+rpc("search_marketplace_products",{p_q:S.q||null,p_category:S.cat||null,p_min_price:S.min?Number(S.min):null,p_max_price:S.max?Number(S.max):null,p_seller_id:S.seller||null,p_sort:S.sort||"newest",p_limit:PER,p_offset:(S.page-1)*PER}).then(function(r){
+if(!r.length){box(list,"empty",S.page>1?"No more products.":"No products match your search.");$("pager").innerHTML="";return}
+var total=Number(r[0].total_count);info.innerHTML=total+" product"+(total===1?"":"s")+(S.seller?' from one supplier · <a href="#products" style="text-decoration:underline">show all suppliers</a>':"");
+list.innerHTML=r.map(card).join("");pager($("pager"),S.page,total,PER,function(n){S.page=n;load();window.scrollTo(0,0)})}).catch(function(e){box(list,"error",emsg(e))})}
+f.onsubmit=function(e){e.preventDefault();var mn=f.min.value,mx=f.max.value;if(mn&&mx&&Number(mn)>Number(mx)){info.textContent="Minimum price cannot be above maximum price.";return}
+S.q=f.q.value.trim();S.cat=f.cat.value;S.sort=f.sort.value;S.min=mn;S.max=mx;S.page=1;load()};load()};
+
+// ----- product details -----
+VIEWS.product=function(){return '<div id="pd"><p class="mute">Loading…</p></div>'};
+AFTER.product=function(){var el=$("pd"),id=(location.hash.split("/")[1]||"").split("?")[0];
+if(!/^[0-9a-f-]{36}$/i.test(id)){box(el,"error","Product not found.");return}
+rpc("get_marketplace_product",{pid:id}).then(function(p){if(!p){box(el,"empty","This product is not available.");return}
+var im=p.images||[],big=im.length?sb.storage.from("product-images").getPublicUrl(im[0].path).data.publicUrl:"";
+function opt(a,l){return a&&a.length?'<label>'+l+'<select id="o'+l+'">'+a.map(function(x){return '<option>'+esc(x)+'</option>'}).join("")+'</select></label>':""}
+var tiers=(p.tiers||[]).length?'<table style="border-collapse:collapse;width:100%"><tr><th align="left">Quantity</th><th align="left">Price / pc</th></tr>'+p.tiers.map(function(t){return '<tr><td>'+t.min_qty+(t.max_qty?"–"+t.max_qty:"+")+' pcs</td><td>'+inr.format(t.unit_price)+'</td></tr>'}).join("")+'</table><p class="mute">Other quantities: '+inr.format(p.base_price)+' / pc</p>':'<p>'+inr.format(p.base_price)+' / pc</p>';
+var s=p.supplier,rt=p.rating||{};
+el.innerHTML='<div style="display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))"><div><div class="img" style="--c1:#1b3a63;--c2:#2f6aa8;border-radius:12px;overflow:hidden">'+(big?'<img id="bigimg" src="'+esc(big)+'" alt="'+esc(p.name)+'" style="width:100%;height:100%;object-fit:cover">':'<span style="color:#fff">No image</span>')+'</div><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">'+im.slice(0,8).map(function(x){var u=sb.storage.from("product-images").getPublicUrl(x.path).data.publicUrl;return '<img src="'+esc(u)+'" alt="" loading="lazy" width="64" height="64" style="object-fit:cover;border-radius:8px;cursor:pointer" data-u="'+esc(u)+'">'}).join("")+'</div></div><div><h1>'+esc(p.name)+'</h1><p class="mute">'+esc(p.category)+(p.brand?" · "+esc(p.brand):"")+(p.fabric_type?" · "+esc(p.fabric_type):"")+'</p><p class="mute">'+stars(rt.avg,rt.count)+'</p><h3>Wholesale pricing (excl. GST)</h3>'+tiers+'<p><strong>Minimum order:</strong> '+p.moq+' pcs · <strong>'+AV[p.stock.availability]+'</strong> ('+p.stock.available+' pcs available)</p><div class="form" style="max-width:none">'+opt(p.sizes,"Size")+opt(p.colors,"Color")+'<label>Quantity (min '+p.moq+')<input id="qty" type="number" min="'+p.moq+'" value="'+p.moq+'"></label><p id="quote" class="mute" role="status"></p><button class="btn o" id="addbtn" type="button">Add to cart</button><div class="banner" id="cartmsg" hidden role="alert"></div></div><p class="mute">'+(p.dispatch_days!=null?"Dispatch within "+p.dispatch_days+" days. ":"")+(p.gst_rate!=null?"GST "+p.gst_rate+"% extra. ":"")+'</p>'+(p.return_policy?'<h3>Return policy</h3><p>'+esc(p.return_policy)+'</p>':'')+'<h3>Supplier</h3><p><a href="#products?seller='+s.id+'" style="text-decoration:underline">'+esc(s.name)+'</a>'+(s.verified?" ✔ Verified":"")+'<br><span class="mute">'+esc(loc(s.city,s.state))+'</span></p></div></div>'+(p.description?'<h3>Description</h3><p>'+esc(p.description)+'</p>':'')+'<h3>Reviews</h3><div id="revs" class="mute">Loading…</div>';
+Array.prototype.forEach.call(el.querySelectorAll("img[data-u]"),function(i){i.onclick=function(){$("bigimg").src=i.getAttribute("data-u")}});
+var qty=$("qty"),q=$("quote"),tm;function quote(){clearTimeout(tm);tm=setTimeout(function(){var n=parseInt(qty.value,10);if(!n||n<p.moq){q.textContent="Minimum order is "+p.moq+" pcs.";return}
+rpc("get_unit_price",{p_product_id:id,p_qty:n}).then(function(u){q.textContent="Price for "+n+" pcs: "+inr.format(u)+" each = "+inr.format(Math.round(u*n*100)/100)+" (excl. GST)"}).catch(function(e){q.textContent=emsg(e)})},300)}
+qty.oninput=quote;quote();
+$("addbtn").onclick=function(){var m=$("cartmsg");if(!window.AUTHSESSION()){location.hash="#login";return}
+var n=parseInt(qty.value,10);if(!n||n<1){m.hidden=false;m.className="banner bad";m.textContent="Enter a valid quantity.";return}
+rpc("add_to_cart",{p_product_id:id,p_quantity:n,p_size:$("oSize")?$("oSize").value:null,p_color:$("oColor")?$("oColor").value:null}).then(function(){m.hidden=false;m.className="banner ok";m.innerHTML='Added to your cart. <a href="#cart" style="text-decoration:underline">View cart</a>'}).catch(function(e){m.hidden=false;m.className="banner bad";m.textContent=emsg(e)})};
+rpc("get_product_reviews",{pid:id,p_limit:5}).then(function(r){$("revs").innerHTML=r.length?r.map(function(x){return '<p>'+"★".repeat(x.rating)+'<br>'+esc(x.comment||"")+'</p>'}).join(""):"No reviews yet."}).catch(function(){$("revs").textContent="Reviews could not be loaded."})
+}).catch(function(e){box(el,"error",emsg(e))})};
+
+// ----- suppliers -----
+VIEWS.suppliers=function(){return '<h1>Suppliers</h1><div class="grid" id="slist"></div><div id="spager" style="display:flex;gap:12px;align-items:center;margin-top:20px"></div>'};
+AFTER.suppliers=function(){var page=1,PER=12,l=$("slist");function load(){box(l,"load","Loading suppliers…");
+rpc("list_marketplace_suppliers",{p_limit:PER,p_offset:(page-1)*PER}).then(function(r){if(!r.length){box(l,"empty","No suppliers are listed yet.");$("spager").innerHTML="";return}
+l.innerHTML=r.map(supCard).join("");pager($("spager"),page,Number(r[0].total_count),PER,function(n){page=n;load();window.scrollTo(0,0)})}).catch(function(e){box(l,"error",emsg(e))})}load()};
+
+// ----- cart -----
+var ISS={product_unavailable:"No longer available",seller_not_approved:"Seller is not available",own_product:"You cannot buy your own product",below_moq:"Below the minimum order quantity",insufficient_stock:"Not enough stock",invalid_size:"Choose a valid size",invalid_color:"Choose a valid color"};
+VIEWS.cart=function(){if(!window.AUTHREADY())return '<p class="mute">Loading…</p>';
+if(!window.AUTHSESSION()){setTimeout(function(){location.hash="#login"},0);return '<p class="mute">Please log in to see your cart.</p>'}
+return '<h1>Your cart</h1><div id="cartbox"><p class="mute">Loading…</p></div>'};
+AFTER.cart=function(){var b=$("cartbox");if(!b)return;
+function load(){Promise.all([rpc("validate_cart"),rpc("checkout_summary")]).then(function(x){var L=x[0],S=x[1];
+if(!L.length){b.innerHTML='<div class="empty"><h3>Your cart is empty</h3><a class="btn n" href="#products">Browse products</a></div>';return}
+b.innerHTML=L.map(function(r){return '<div class="card" style="padding:14px;margin-bottom:12px"><strong>'+esc(r.product_name)+'</strong><span class="mute"> · '+esc(r.supplier_name)+(r.size?" · "+esc(r.size):"")+(r.color?" · "+esc(r.color):"")+'</span><div class="mute">'+inr.format(r.unit_price)+' / pc (price for '+r.product_total_qty+' pcs of this product) · MOQ '+r.moq+' · '+r.available_qty+' available</div><div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap"><input type="number" min="1" value="'+r.quantity+'" data-id="'+r.cart_item_id+'" aria-label="Quantity" style="width:90px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text)"><strong>'+inr.format(r.line_total)+'</strong><button class="btn l" data-rm="'+r.cart_item_id+'" type="button">Remove</button></div>'+(r.issue?'<div class="banner bad" style="margin-top:8px" role="alert">'+esc(ISS[r.issue]||r.issue)+'</div>':'')+'</div>'}).join("")+'<div class="form" style="max-width:420px"><div>Product total: '+inr.format(S.list_total)+'</div><div>Quantity discount: −'+inr.format(S.discount_total)+'</div><div>Subtotal: '+inr.format(S.subtotal)+'</div><div>Shipping: '+inr.format(S.shipping_total)+'</div><div>GST: '+inr.format(S.tax_total)+'</div><h3>Total payable: '+inr.format(S.payable_total)+'</h3><p class="mute">Each seller ships and bills separately. Quantity pricing uses your total quantity of each product.</p>'+(S.has_issues?'<p class="banner bad" role="alert">Fix the items marked above before checking out.</p>':'')+'<button class="btn n" type="button" disabled>Checkout: coming in the next step</button></div>';
+Array.prototype.forEach.call(b.querySelectorAll("input[data-id]"),function(i){i.onchange=function(){var v=parseInt(i.value,10);if(!v||v<1){load();return}sb.from("cart_items").update({quantity:v}).eq("id",i.getAttribute("data-id")).then(function(r){if(r.error)box(b,"error",emsg(r.error));else load()})}});
+Array.prototype.forEach.call(b.querySelectorAll("button[data-rm]"),function(i){i.onclick=function(){sb.from("cart_items").delete().eq("id",i.getAttribute("data-rm")).then(function(r){if(r.error)box(b,"error",emsg(r.error));else load()})}})
+}).catch(function(e){box(b,"error",emsg(e))})}load()};
+
+loadHome();
 })();
 </script>
 </body>
